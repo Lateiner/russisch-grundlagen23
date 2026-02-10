@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Binäre Auswahl - Bedeutung</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --success-bg: #d4edda;
+            --success-border: #28a745;
+            --error-bg: #f8d7da;
+            --error-border: #dc3545;
+            --btn-hover: #e8eaf6;
+            --selected-blue: #e3f2fd;
+            --selected-border: #2196f3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .intro {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Aufgaben-Styling --- */
+        .task-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .scenario {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .context-hint {
+            display: block;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        /* --- Binary Choice Buttons --- */
+        .options-grid {
+            display: flex;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            flex: 1;
+            padding: 15px 10px;
+            font-size: 1.1em;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            position: relative;
+            font-family: 'Arial', sans-serif; /* Für kyrillisch */
+        }
+
+        .choice-btn:hover {
+            background-color: var(--btn-hover);
+            border-color: #bbb;
+        }
+
+        /* Status: Ausgewählt (noch nicht geprüft) */
+        .choice-btn.selected {
+            background-color: var(--selected-blue);
+            border-color: var(--selected-border);
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--selected-border);
+        }
+
+        /* Status: Richtig */
+        .choice-btn.correct {
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+            color: #155724;
+        }
+        
+        /* Status: Falsch */
+        .choice-btn.wrong {
+            background-color: var(--error-bg);
+            border-color: var(--error-border);
+            color: #721c24;
+            opacity: 0.7;
+        }
+
+        /* Icon Indikatoren */
+        .status-icon {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        .choice-btn.correct .status-icon.check { display: block; }
+        .choice-btn.wrong .status-icon.cross { display: block; }
+
+        /* --- Controls --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback-area {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 1.5em;
+        }
+
+        /* --- Responsive Design (Mobile) --- */
+        @media (max-width: 600px) {
+            .options-grid {
+                flex-direction: column; /* Buttons untereinander auf Handy */
+                gap: 10px;
+            }
+
+            .choice-btn {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button.action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Видеть oder Смотреть?</h1>
+    
+    <div class="intro">
+        <p><strong>Aufgabe:</strong> Entscheide anhand der Bedeutung. Geht es um den bewussten <em>Prozess</em> (schauen, ansehen) oder um die physische <em>Fähigkeit/Wahrnehmung</em> (sehen)?</p>
+    </div>
+
+    <div class="task-container">
+
+        <!-- Frage 1 -->
+        <div class="question-card" id="q1" data-correct="vid">
+            <span class="context-hint">Situation: Beim Optiker / Ohne Brille</span>
+            <div class="scenario">"Ich habe meine Brille vergessen. Ich kann nichts ..."</div>
+            <div class="options-grid">
+                <button class="choice-btn" onclick="selectOption('q1', 'vid')">
+                    видеть
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+                <button class="choice-btn" onclick="selectOption('q1', 'smot')">
+                    смотреть
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Frage 2 -->
+        <div class="question-card" id="q2" data-correct="smot">
+            <span class="context-hint">Situation: Freizeit / Hobby</span>
+            <div class="scenario">"Am Abend möchte ich einen interessanten Film ..."</div>
+            <div class="options-grid">
+                <button class="choice-btn" onclick="selectOption('q2', 'vid')">
+                    видеть
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+                <button class="choice-btn" onclick="selectOption('q2', 'smot')">
+                    смотреть
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Frage 3 -->
+        <div class="question-card" id="q3" data-correct="vid">
+            <span class="context-hint">Situation: Begegnung auf der Straße</span>
+            <div class="scenario">"Hallo! Ich habe dich gestern im Park ..."</div>
+            <div class="options-grid">
+                <button class="choice-btn" onclick="selectOption('q3', 'vid')">
+                    видел / видела
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+                <button class="choice-btn" onclick="selectOption('q3', 'smot')">
+                    смотрел / смотрела
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Frage 4 -->
+        <div class="question-card" id="q4" data-correct="smot">
+            <span class="context-hint">Situation: Aufforderung / Imperativ</span>
+            <div class="scenario">"... mal! Da vorne läuft ein Fuchs!"</div>
+            <div class="options-grid">
+                <button class="choice-btn" onclick="selectOption('q4', 'vid')">
+                    Видь!
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+                <button class="choice-btn" onclick="selectOption('q4', 'smot')">
+                    Смотри!
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Frage 5 -->
+        <div class="question-card" id="q5" data-correct="vid">
+            <span class="context-hint">Situation: Suche nach einem Gegenstand</span>
+            <div class="scenario">"Ich suche mein Handy, aber ich ... es nicht."</div>
+            <div class="options-grid">
+                <button class="choice-btn" onclick="selectOption('q5', 'vid')">
+                    вижу
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+                <button class="choice-btn" onclick="selectOption('q5', 'smot')">
+                    смотрю
+                    <span class="status-icon check">✓</span><span class="status-icon cross">✗</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="feedback-area" id="main-feedback"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="showSolution()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    // Funktion zum Auswählen einer Option
+    function selectOption(questionId, value) {
+        const card = document.getElementById(questionId);
+        // Alle Buttons in dieser Karte zurücksetzen
+        const buttons = card.querySelectorAll('.choice-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('selected', 'correct', 'wrong');
+            // Das Value-Attribut wird temporär am Button gesetzt, um es später zu prüfen
+            // Hier nutzen wir einfach den Index oder vergleichen den Aufrufparameter
+            // Einfacher: Wir merken uns die Auswahl am Parent
+        });
+
+        // Den geklickten Button finden (Event Bubbling oder direkt)
+        // Da wir onclick direkt am Button haben:
+        const clickedBtn = event.currentTarget; // Sicherstellen, dass wir den Button haben
+        clickedBtn.classList.add('selected');
+        
+        // Speichern der Auswahl im Datensatz der Karte
+        card.dataset.userChoice = value;
+    }
+
+    // Überprüfen
+    function checkAll() {
+        const questions = document.querySelectorAll('.question-card');
+        let allCorrect = true;
+        let answeredCount = 0;
+
+        questions.forEach(card => {
+            const correctAnswer = card.dataset.correct;
+            const userChoice = card.dataset.userChoice;
+            const buttons = card.querySelectorAll('.choice-btn');
+
+            // Reset visual states first (keep selected for logic)
+            buttons.forEach(btn => {
+                btn.classList.remove('correct', 'wrong');
+            });
+
+            if (userChoice) {
+                answeredCount++;
+                // Finden des ausgewählten Buttons
+                let selectedBtn;
+                // Wir müssen den Button finden, der 'selected' hat
+                buttons.forEach(btn => {
+                    if (btn.classList.contains('selected')) selectedBtn = btn;
+                });
+
+                if (userChoice === correctAnswer) {
+                    selectedBtn.classList.add('correct');
+                } else {
+                    selectedBtn.classList.add('wrong');
+                    allCorrect = false;
+                }
+            } else {
+                allCorrect = false;
+            }
+        });
+
+        const feedback = document.getElementById('main-feedback');
+        if (answeredCount === 0) {
+            feedback.textContent = "Bitte wähle zuerst Antworten aus.";
+            feedback.style.color = "#d9534f";
+        } else if (answeredCount < questions.length) {
+            feedback.textContent = "Du hast noch nicht alle Fragen beantwortet.";
+            feedback.style.color = "#f0ad4e"; // Orange
+        } else if (allCorrect) {
+            feedback.textContent = "Fantastisch! Alles richtig verstanden.";
+            feedback.style.color = "#28a745";
+        } else {
+            feedback.textContent = "Einige Antworten sind falsch. Versuch es noch einmal!";
+            feedback.style.color = "#dc3545";
+        }
+    }
+
+    // Zurücksetzen
+    function resetAll() {
+        const questions = document.querySelectorAll('.question-card');
+        questions.forEach(card => {
+            delete card.dataset.userChoice; // Auswahl löschen
+            const buttons = card.querySelectorAll('.choice-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'wrong');
+            });
+        });
+        document.getElementById('main-feedback').textContent = "";
+    }
+
+    // Lösung anzeigen
+    function showSolution() {
+        // Erst alles resetten, damit keine Mischung aus User-Antwort und Lösung entsteht
+        resetAll();
+        
+        const questions = document.querySelectorAll('.question-card');
+        questions.forEach(card => {
+            const correctAnswer = card.dataset.correct;
+            const buttons = card.querySelectorAll('.choice-btn');
+            
+            // Simuliert einen Klick auf die richtige Antwort oder markiert sie direkt
+            // Wir müssen herausfinden, welcher Button welchen Wert hat.
+            // Da wir selectOption('id', 'value') im HTML haben, parsen wir das onclick Attribut oder verlassen uns auf die Reihenfolge
+            // Robuster: Wir setzen data-value Attribute im HTML (siehe unten Korrektur für Robustheit)
+            
+            // Workaround für bestehendes HTML-Setup (Parsing onclick string):
+            buttons.forEach(btn => {
+                const onClickText = btn.getAttribute('onclick');
+                if (onClickText.includes(`'${correctAnswer}'`)) {
+                    btn.classList.add('correct');
+                    // Optional: 'selected' hinzufügen, damit es wie eine Antwort aussieht
+                    // btn.classList.add('selected'); 
+                }
+            });
+        });
+        
+        const feedback = document.getElementById('main-feedback');
+        feedback.textContent = "Lösungen angezeigt.";
+        feedback.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
