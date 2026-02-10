@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch Grammatik: Видеть vs. Смотреть</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-hover: #303f9f;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #d4edda;
+            --success-text: #155724;
+            --error-color: #f8d7da;
+            --error-text: #721c24;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Introduction Card */
+        .intro-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .example-box {
+            background-color: #e8eaf6;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        /* Exercise Cards */
+        .exercise-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .task-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Dropdowns and Interactive Elements */
+        select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            margin: 5px 0;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        select.correct {
+            background-color: var(--success-color);
+            border-color: var(--success-text);
+            color: var(--success-text);
+        }
+
+        select.wrong {
+            background-color: var(--error-color);
+            border-color: var(--error-text);
+            color: var(--error-text);
+        }
+
+        /* Radio Buttons Layout */
+        .radio-group label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .radio-group label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .radio-group label.correct-highlight {
+            background-color: var(--success-color);
+            color: var(--success-text);
+        }
+
+        .radio-group label.wrong-highlight {
+            background-color: var(--error-color);
+            color: var(--error-text);
+        }
+
+        /* Drag and Drop Styling */
+        .dd-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .dd-source, .dd-target {
+            min-height: 60px;
+            padding: 10px;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 120px;
+            background: #fafafa;
+            align-items: center;
+        }
+
+        .dd-target {
+            border-color: var(--primary-color);
+            background-color: #f0f4ff;
+        }
+        
+        .dd-target h4 {
+            margin-top: 0;
+            font-size: 0.9em;
+            text-align: center;
+            color: #666;
+            pointer-events: none;
+            width: 100%;
+        }
+
+        /* Sortable Task 6 Styling */
+        .sort-target {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-content: flex-start;
+        }
+
+        .draggable-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: grab;
+            display: inline-block;
+            user-select: none;
+            font-size: 1.1em;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+        }
+
+        .draggable-item.correct {
+            background-color: #28a745;
+        }
+
+        .draggable-item.wrong {
+            background-color: #dc3545;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-check {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-reset {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-solve {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        /* Feedback Area */
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        /* Specific text styling */
+        .ru {
+            font-family: 'Arial', sans-serif;
+            font-weight: normal; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik: видеть vs. смотреть</h1>
+
+    <div class="intro-card">
+        <h2>Einführung</h2>
+        <p>Im Russischen gibt es zwei wichtige Verben für die visuelle Wahrnehmung:</p>
+        
+        <div class="example-box">
+            <h3>1. видеть (sehen)</h3>
+            <p><strong>Bedeutung:</strong> Die Fähigkeit zu sehen / etwas zufällig bemerken. Passiv.</p>
+            <ul>
+                <li><strong>Beispiel:</strong> Я вижу дом. (Ich sehe ein Haus - es ist einfach da).</li>
+                <li><strong>Frage:</strong> видеть кого? что? (Akkusativ)</li>
+            </ul>
+        </div>
+
+        <div class="example-box">
+            <h3>2. смотреть (schauen)</h3>
+            <p><strong>Bedeutung:</strong> Der Prozess / den Blick bewusst richten. Aktiv.</p>
+            <ul>
+                <li><strong>Medien:</strong> смотреть фильм / телевизор (Akkusativ).</li>
+                <li><strong>Blickrichtung:</strong> смотреть <strong>на</strong> кого/что (на + Akkusativ).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 1: Multiple Choice Bedeutung -->
+    <div class="exercise-card" id="task1">
+        <div class="task-header">Aufgabe 1: Bedeutung verstehen</div>
+        <p>Wähle das richtige Verb für den Satz: "Ich schaue gerade einen Film." (Aktiver Prozess)</p>
+        <div class="radio-group">
+            <label><input type="radio" name="t1" value="wrong"> Я вижу фильм.</label>
+            <label><input type="radio" name="t1" value="correct"> Я смотрю фильм.</label>
+        </div>
+        <div class="feedback" id="t1-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkRadio('t1')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetRadio('t1')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadio('t1')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 2: Konjugation Видеть (Dropdown) -->
+    <div class="exercise-card" id="task2">
+        <div class="task-header">Aufgabe 2: Konjugation von видеть (sehen)</div>
+        <p>Wähle die richtige Form aus der Liste.</p>
+        <p>1. Я 
+            <select class="ru" data-ans="вижу">
+                <option value="">...</option>
+                <option value="вижу">вижу</option>
+                <option value="видишь">видишь</option>
+                <option value="смотрю">смотрю</option>
+            </select>
+            собаку. (ich sehe)
+        </p>
+        <p>2. Ты 
+            <select class="ru" data-ans="видишь">
+                <option value="">...</option>
+                <option value="видим">видим</option>
+                <option value="видишь">видишь</option>
+                <option value="смотришь">смотришь</option>
+            </select>
+            меня? (du siehst)
+        </p>
+        <p>3. Они 
+            <select class="ru" data-ans="видят">
+                <option value="">...</option>
+                <option value="видит">видит</option>
+                <option value="видят">видят</option>
+                <option value="смотрят">смотрят</option>
+            </select>
+            дом. (sie sehen)
+        </p>
+        <div class="feedback" id="t2-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDropdowns('task2')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDropdowns('task2')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDropdowns('task2')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 3: Konjugation Смотреть (Dropdown) -->
+    <div class="exercise-card" id="task3">
+        <div class="task-header">Aufgabe 3: Konjugation von смотреть (schauen)</div>
+        <p>Wähle die richtige Form aus der Liste.</p>
+        <p>1. Я 
+            <select class="ru" data-ans="смотрю">
+                <option value="">...</option>
+                <option value="вижу">вижу</option>
+                <option value="смотрю">смотрю</option>
+                <option value="смотрит">смотрит</option>
+            </select>
+            телевизор. (ich schaue)
+        </p>
+        <p>2. Мы 
+            <select class="ru" data-ans="смотрим">
+                <option value="">...</option>
+                <option value="смотрим">смотрим</option>
+                <option value="видим">видим</option>
+                <option value="смотрите">смотрите</option>
+            </select>
+            на доску. (wir schauen)
+        </p>
+        <p>3. Вы 
+            <select class="ru" data-ans="смотрите">
+                <option value="">...</option>
+                <option value="смотрит">смотрит</option>
+                <option value="видите">видите</option>
+                <option value="смотрите">смотрите</option>
+            </select>
+            видео? (ihr schaut)
+        </p>
+        <div class="feedback" id="t3-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDropdowns('task3')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDropdowns('task3')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDropdowns('task3')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 4: Drag & Drop Kategorisierung -->
+    <div class="exercise-card" id="task4">
+        <div class="task-header">Aufgabe 4: Zuordnung</div>
+        <p>Ziehe die Wörter in die richtige Kategorie. Benutzt man sie mit "смотреть" (Akkusativ direkt - Medien) oder "смотреть НА" (Blickrichtung)?</p>
+        
+        <div class="dd-container">
+            <div class="dd-source" id="t4-source" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="d1" data-target="t4-target1">фильм</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="d2" data-target="t4-target2">маму</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="d3" data-target="t4-target1">новости</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="d4" data-target="t4-target2">картину</span>
+            </div>
+        </div>
+        <div class="dd-container">
+            <div class="dd-target" id="t4-target1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h4>смотреть + Akkusativ (Medien)</h4>
+            </div>
+            <div class="dd-target" id="t4-target2" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h4>смотреть НА + Akkusativ (Blick)</h4>
+            </div>
+        </div>
+
+        <div class="feedback" id="t4-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDragDrop('task4')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDragDrop('task4', 't4-source')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDragDrop('task4')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 5: Selektion (Sehkraft) -->
+    <div class="exercise-card" id="task5">
+        <div class="task-header">Aufgabe 5: Kontext Sehkraft</div>
+        <p>Vervollständige: "Ich brauche eine Brille, weil ich schlecht ..."</p>
+        <select id="t5-select" class="ru" data-ans="вижу">
+            <option value="">-- Bitte wählen --</option>
+            <option value="смотрю">смотрю</option>
+            <option value="вижу">вижу</option>
+        </select>
+        <div class="feedback" id="t5-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDropdowns('task5')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDropdowns('task5')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDropdowns('task5')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 6: Satzbau (Drag & Drop Sortieren) -->
+    <div class="exercise-card" id="task6">
+        <div class="task-header">Aufgabe 6: Satzbau (Drag & Drop)</div>
+        <p>Bilde den Satz: "Wir schauen auf die Katze."</p>
+        <p>Ziehe die Wörter unten in den grauen Kasten.</p>
+        
+        <!-- Source for words -->
+        <div class="dd-container">
+            <div class="dd-source" id="t6-source" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="w6-1">на</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="w6-2">Мы</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="w6-3">кошку</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="w6-4">смотрим</span>
+            </div>
+        </div>
+
+        <!-- Target for sentence -->
+        <div class="dd-container">
+            <div class="dd-target sort-target" id="t6-target" ondrop="drop(event)" ondragover="allowDrop(event)" style="min-height: 80px;">
+                <h4 style="width: 100%; color: #999;">Hier Wörter ablegen...</h4>
+            </div>
+        </div>
+
+        <div class="feedback" id="t6-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkSentenceOrder('task6', 'Мы смотрим на кошку')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDragDrop('task6', 't6-source')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSentenceOrder('task6', ['w6-2', 'w6-4', 'w6-1', 'w6-3'])">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 7: Präpositionen (Dropdown) -->
+    <div class="exercise-card" id="task7">
+        <div class="task-header">Aufgabe 7: Präpositionen</div>
+        <p>Wähle "на" (auf) oder "-" (keine Präposition).</p>
+        <p>1. Он смотрит 
+            <select class="ru" data-ans="-">
+                <option value="">...</option>
+                <option value="-">-</option>
+                <option value="на">на</option>
+            </select>
+            телевизор.
+        </p>
+        <p>2. Он смотрит 
+            <select class="ru" data-ans="на">
+                <option value="">...</option>
+                <option value="-">-</option>
+                <option value="на">на</option>
+            </select>
+            девушку.
+        </p>
+        <p>3. Вы смотрите 
+            <select class="ru" data-ans="-">
+                <option value="">...</option>
+                <option value="-">-</option>
+                <option value="на">на</option>
+            </select>
+            сериал?
+        </p>
+        <div class="feedback" id="t7-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDropdowns('task7')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDropdowns('task7')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDropdowns('task7')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 8: Wahr oder Falsch -->
+    <div class="exercise-card" id="task8">
+        <div class="task-header">Aufgabe 8: Grammatik-Check</div>
+        <p>Aussage: Wenn man sagt "Ich sehe den Tisch" (Ich nehme ihn wahr), benutzt man das Verb "смотреть".</p>
+        <div class="radio-group">
+            <label><input type="radio" name="t8" value="wrong"> Wahr</label>
+            <label><input type="radio" name="t8" value="correct"> Falsch</label>
+        </div>
+        <div class="feedback" id="t8-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkRadio('t8')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetRadio('t8')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadio('t8')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 9: Auswahl im Satz -->
+    <div class="exercise-card" id="task9">
+        <div class="task-header">Aufgabe 9: Auswahl</div>
+        <p>Wähle das passende Wort: "Ich war im Museum und habe Bilder ..."</p>
+        <div class="radio-group">
+            <label><input type="radio" name="t9" value="wrong"> видел (sah - zufällig)</label>
+            <label><input type="radio" name="t9" value="correct"> смотрел (betrachtete - aktiv)</label>
+        </div>
+        <div class="feedback" id="t9-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkRadio('t9')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetRadio('t9')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadio('t9')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 10: Drag & Drop Lückentext -->
+    <div class="exercise-card" id="task10">
+        <div class="task-header">Aufgabe 10: Lücken füllen (Drag & Drop)</div>
+        <p>Vervollständige den Dialog.</p>
+        <div class="dd-container">
+            <div class="dd-source" id="t10-source" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="d10-1" data-target="t10-target1">видишь</span>
+                <span class="draggable-item ru" draggable="true" ondragstart="drag(event)" id="d10-2" data-target="t10-target2">смотрю</span>
+            </div>
+        </div>
+        <p>
+            - Ты <span class="dd-target" id="t10-target1" style="display:inline-block; vertical-align:middle; padding:5px; min-width:80px; min-height:30px;" ondrop="drop(event)" ondragover="allowDrop(event)"></span> этот дом? (Siehst du dieses Haus?)<br>
+            - Нет, я <span class="dd-target" id="t10-target2" style="display:inline-block; vertical-align:middle; padding:5px; min-width:80px; min-height:30px;" ondrop="drop(event)" ondragover="allowDrop(event)"></span> туда, но ничего не вижу. (Nein, ich schaue dorthin, aber sehe nichts.)
+        </p>
+        
+        <div class="feedback" id="t10-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDragDrop('task10')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDragDrop('task10', 't10-source')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDragDrop('task10')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 11: Imperativ / Aufforderung -->
+    <div class="exercise-card" id="task11">
+        <div class="task-header">Aufgabe 11: Aufforderung</div>
+        <p>Wie sagt man auf Russisch "Schau mal!"?</p>
+        <div class="radio-group">
+            <label><input type="radio" name="t11" value="wrong"> Види!</label>
+            <label><input type="radio" name="t11" value="correct"> Смотри!</label>
+        </div>
+        <div class="feedback" id="t11-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkRadio('t11')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetRadio('t11')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadio('t11')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+    <!-- ÜBUNG 12: Gemischter Lückentext (Dropdown) -->
+    <div class="exercise-card" id="task12">
+        <div class="task-header">Aufgabe 12: Abschlusstest</div>
+        <p>Wähle die passende Form für die Lücken.</p>
+        <p>
+            Вчера вечером я 
+            <select class="ru" data-ans="смотрел">
+                <option value="">...</option>
+                <option value="смотрел">смотрел</option>
+                <option value="видел">видел</option>
+                <option value="смотрела">смотрела</option>
+            </select>
+            (schaute - Maskulin) интересный фильм. <br>
+            В фильме я 
+            <select class="ru" data-ans="видел">
+                <option value="">...</option>
+                <option value="смотрел">смотрел</option>
+                <option value="видел">видел</option>
+                <option value="видела">видела</option>
+            </select>
+            (sah - Maskulin) известного актёра.<br>
+            Моя сестра не 
+            <select class="ru" data-ans="смотрела">
+                <option value="">...</option>
+                <option value="смотрела">смотрела</option>
+                <option value="видела">видела</option>
+                <option value="смотрели">смотрели</option>
+            </select>
+            (schaute) фильм, потому что она плохо 
+            <select class="ru" data-ans="видит">
+                <option value="">...</option>
+                <option value="смотрит">смотрит</option>
+                <option value="видят">видят</option>
+                <option value="видит">видит</option>
+            </select>
+            (sieht).
+        </p>
+        <div class="feedback" id="t12-feedback"></div>
+        <div class="controls">
+            <button class="btn-check" onclick="checkDropdowns('task12')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDropdowns('task12')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDropdowns('task12')">Lösung anzeigen</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Allgemeine Hilfsfunktionen ---
+
+    function setFeedback(elementId, message, type) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.innerHTML = message;
+            el.style.color = type === 'success' ? 'var(--success-text)' : 'var(--error-text)';
+        }
+    }
+
+    // --- NEUE LOGIK: Dropdowns (Aufgaben 2, 3, 5, 7, 12) ---
+
+    function checkDropdowns(containerId) {
+        const container = document.getElementById(containerId);
+        const selects = container.querySelectorAll('select');
+        let allCorrect = true;
+        let answered = false;
+
+        selects.forEach(select => {
+            if(select.value !== "") answered = true;
+            if (select.value === select.dataset.ans) {
+                select.classList.add('correct');
+                select.classList.remove('wrong');
+            } else {
+                select.classList.add('wrong');
+                select.classList.remove('correct');
+                allCorrect = false;
+            }
+        });
+
+        const feedbackId = containerId === 'task5' ? 't5-feedback' : 
+                           containerId === 'task2' ? 't2-feedback' : 
+                           containerId === 'task3' ? 't3-feedback' : 
+                           containerId === 'task7' ? 't7-feedback' : 't12-feedback';
+        
+        if (!answered) {
+            setFeedback(feedbackId, "Bitte wähle eine Antwort.", 'error');
+        } else if (allCorrect) {
+            setFeedback(feedbackId, "Alles richtig! Отлично!", 'success');
+        } else {
+            setFeedback(feedbackId, "Einige Antworten sind falsch.", 'error');
+        }
+    }
+
+    function resetDropdowns(containerId) {
+        const container = document.getElementById(containerId);
+        const selects = container.querySelectorAll('select');
+        selects.forEach(select => {
+            select.value = '';
+            select.classList.remove('correct', 'wrong');
+        });
+        
+        const feedbackId = containerId === 'task5' ? 't5-feedback' : 
+                           containerId === 'task2' ? 't2-feedback' : 
+                           containerId === 'task3' ? 't3-feedback' : 
+                           containerId === 'task7' ? 't7-feedback' : 't12-feedback';
+        setFeedback(feedbackId, '', '');
+    }
+
+    function solveDropdowns(containerId) {
+        const container = document.getElementById(containerId);
+        const selects = container.querySelectorAll('select');
+        selects.forEach(select => {
+            select.value = select.dataset.ans;
+            select.classList.remove('wrong');
+            select.classList.add('correct');
+        });
+        const feedbackId = containerId === 'task5' ? 't5-feedback' : 
+                           containerId === 'task2' ? 't2-feedback' : 
+                           containerId === 'task3' ? 't3-feedback' : 
+                           containerId === 'task7' ? 't7-feedback' : 't12-feedback';
+        setFeedback(feedbackId, "Lösung angezeigt.", 'success');
+    }
+
+    // --- Logik für Radio Buttons (Aufgaben 1, 8, 9, 11) ---
+
+    function checkRadio(groupName) {
+        const options = document.getElementsByName(groupName);
+        let selected = null;
+        let correct = null;
+        let feedbackId = groupName + '-feedback';
+
+        options.forEach(opt => {
+            opt.parentElement.classList.remove('correct-highlight', 'wrong-highlight');
+            if (opt.checked) selected = opt;
+        });
+
+        if (!selected) {
+            setFeedback(feedbackId, "Bitte wähle eine Antwort.", 'error');
+            return;
+        }
+
+        if (selected.value === 'correct') {
+            selected.parentElement.classList.add('correct-highlight');
+            setFeedback(feedbackId, "Richtig!", 'success');
+        } else {
+            selected.parentElement.classList.add('wrong-highlight');
+            setFeedback(feedbackId, "Leider falsch.", 'error');
+        }
+    }
+
+    function resetRadio(groupName) {
+        const options = document.getElementsByName(groupName);
+        options.forEach(opt => {
+            opt.checked = false;
+            opt.parentElement.classList.remove('correct-highlight', 'wrong-highlight');
+        });
+        setFeedback(groupName + '-feedback', '', '');
+    }
+
+    function solveRadio(groupName) {
+        const options = document.getElementsByName(groupName);
+        options.forEach(opt => {
+            opt.parentElement.classList.remove('wrong-highlight');
+            if (opt.value === 'correct') {
+                opt.checked = true;
+                opt.parentElement.classList.add('correct-highlight');
+            }
+        });
+        setFeedback(groupName + '-feedback', "Lösung angezeigt.", 'success');
+    }
+
+
+    // --- Logik für Drag and Drop (Aufgaben 4, 6, 10) ---
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var draggedElement = document.getElementById(data);
+        
+        let target = ev.target;
+        
+        // Finde das nächstgelegene Drop-Ziel (dd-target oder dd-source)
+        while(target && !target.classList.contains('dd-target') && !target.classList.contains('dd-source')) {
+            target = target.parentElement;
+        }
+
+        if (target && (target.classList.contains('dd-target') || target.classList.contains('dd-source'))) {
+            target.appendChild(draggedElement);
+            // Reset status beim Verschieben
+            draggedElement.classList.remove('correct', 'wrong');
+        }
+    }
+
+    // Check für Aufgabe 4 und 10 (Kategorisierung / Lücke)
+    function checkDragDrop(taskId) {
+        const container = document.getElementById(taskId);
+        const draggables = container.querySelectorAll('.draggable-item');
+        let allCorrect = true;
+
+        draggables.forEach(el => {
+            const correctTargetId = el.dataset.target;
+            const parentId = el.parentElement.id;
+
+            if (parentId === correctTargetId) {
+                el.classList.add('correct');
+                el.classList.remove('wrong');
+            } else {
+                if (!parentId.includes('source')) {
+                     el.classList.add('wrong');
+                     el.classList.remove('correct');
+                     allCorrect = false;
+                } else {
+                    allCorrect = false;
+                    el.classList.remove('correct', 'wrong');
+                }
+            }
+        });
+
+        const source = container.querySelector('.dd-source');
+        const feedbackId = taskId === 'task4' ? 't4-feedback' : 't10-feedback';
+
+        if(source.children.length > 0) {
+             setFeedback(feedbackId, "Bitte ordne alle Elemente zu.", 'error');
+        } else if (allCorrect) {
+            setFeedback(feedbackId, "Super gemacht!", 'success');
+        } else {
+            setFeedback(feedbackId, "Einige Zuordnungen sind falsch.", 'error');
+        }
+    }
+
+    function resetDragDrop(taskId, sourceId) {
+        const container = document.getElementById(taskId);
+        const source = document.getElementById(sourceId);
+        const draggables = container.querySelectorAll('.draggable-item');
+
+        draggables.forEach(el => {
+            source.appendChild(el);
+            el.classList.remove('correct', 'wrong');
+        });
+
+        const feedbackId = taskId === 'task4' ? 't4-feedback' : 
+                           taskId === 'task6' ? 't6-feedback' : 't10-feedback';
+        setFeedback(feedbackId, "", '');
+    }
+
+    function solveDragDrop(taskId) {
+        const container = document.getElementById(taskId);
+        const draggables = container.querySelectorAll('.draggable-item');
+
+        draggables.forEach(el => {
+            const targetId = el.dataset.target;
+            const targetEl = document.getElementById(targetId);
+            if(targetEl) {
+                targetEl.appendChild(el);
+                el.classList.add('correct');
+                el.classList.remove('wrong');
+            }
+        });
+        
+        const feedbackId = taskId === 'task4' ? 't4-feedback' : 't10-feedback';
+        setFeedback(feedbackId, "Lösung angezeigt.", 'success');
+    }
+
+    // --- NEUE LOGIK: Satzbau Check (Aufgabe 6) ---
+
+    function checkSentenceOrder(taskId, correctSentence) {
+        const targetContainer = document.getElementById('t6-target');
+        const words = targetContainer.querySelectorAll('.draggable-item');
+        let userSentence = "";
+
+        // Wörter sammeln in der Reihenfolge, wie sie im Container sind
+        words.forEach(word => {
+            userSentence += word.innerText + " ";
+        });
+        userSentence = userSentence.trim();
+
+        const feedbackId = 't6-feedback';
+
+        if (words.length === 0) {
+            setFeedback(feedbackId, "Bitte ziehe die Wörter in den Kasten.", 'error');
+            return;
+        }
+
+        if (userSentence === correctSentence) {
+            setFeedback(feedbackId, "Perfekt! Der Satz ist richtig.", 'success');
+            words.forEach(w => w.classList.add('correct'));
+        } else {
+            setFeedback(feedbackId, "Die Reihenfolge ist noch nicht richtig.", 'error');
+            words.forEach(w => w.classList.add('wrong'));
+        }
+    }
+
+    function solveSentenceOrder(taskId, correctOrderIds) {
+        const targetContainer = document.getElementById('t6-target');
+        correctOrderIds.forEach(id => {
+            const el = document.getElementById(id);
+            targetContainer.appendChild(el);
+            el.classList.add('correct');
+            el.classList.remove('wrong');
+        });
+        setFeedback('t6-feedback', "Lösung angezeigt.", 'success');
+    }
+
+</script>
+
+</body>
+</html>
