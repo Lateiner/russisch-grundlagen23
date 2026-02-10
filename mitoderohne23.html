@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Mit oder Ohne НА? (8 Sätze)</title>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --border-color: #ccc;
+            --success-color: #28a745;
+            --success-bg: #d4edda;
+            --error-color: #dc3545;
+            --error-bg: #f8d7da;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 2.2; /* Erhöhter Zeilenabstand für mobile Lesbarkeit */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .intro-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            line-height: 1.6;
+        }
+
+        .rule-highlight {
+            background-color: #e8eaf6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* --- Aufgaben-Karte --- */
+        .task-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .sentence-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
+        }
+
+        .sentence-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* --- Drop-Down Styling --- */
+        select.prep-select {
+            display: inline-block;
+            padding: 8px 30px 8px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-color: #fff;
+            cursor: pointer;
+            margin: 0 5px;
+            vertical-align: middle;
+            min-width: 80px;
+            font-weight: 500;
+            
+            /* Custom Arrow */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%233f51b5%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        select.prep-select:hover {
+            border-color: var(--primary-color);
+            background-color: #fcfcfc;
+        }
+
+        select.prep-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+        }
+
+        /* Status: Richtig */
+        select.prep-select.correct {
+            border-color: var(--success-color);
+            background-color: var(--success-bg);
+            color: #155724;
+        }
+
+        /* Status: Falsch */
+        select.prep-select.wrong {
+            border-color: var(--error-color);
+            background-color: var(--error-bg);
+            color: #721c24;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 1.5em;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 500px) {
+            .task-card {
+                padding: 15px;
+            }
+            select.prep-select {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mit oder Ohne НА?</h1>
+    
+    <div class="intro-box">
+        <p><strong>Die Regel:</strong></p>
+        <ul style="margin: 0; padding-left: 20px;">
+            <li><span class="rule-highlight">смотреть (—)</span> + Akkusativ: Medien konsumieren (Fernsehen, Film, Video).</li>
+            <li><span class="rule-highlight">смотреть НА</span> + Akkusativ: Den Blick auf etwas oder jemanden richten (Person, Tafel, Bild).</li>
+        </ul>
+    </div>
+
+    <div class="task-card">
+        
+        <div class="sentence-item">
+            1. Вечером я обычно смотрю 
+            <select class="prep-select" data-answer="-">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            телевизор.
+        </div>
+
+        <div class="sentence-item">
+            2. Студенты смотрят 
+            <select class="prep-select" data-answer="на">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            доску.
+        </div>
+
+        <div class="sentence-item">
+            3. Он сидит в кафе и смотрит 
+            <select class="prep-select" data-answer="на">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            девушку.
+        </div>
+
+        <div class="sentence-item">
+            4. Вы уже смотрели 
+            <select class="prep-select" data-answer="-">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            этот новый фильм?
+        </div>
+
+        <div class="sentence-item">
+            5. Мы были в музее и смотрели 
+            <select class="prep-select" data-answer="на">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            картины Пикассо.
+        </div>
+
+        <div class="sentence-item">
+            6. Мой брат любит смотреть 
+            <select class="prep-select" data-answer="-">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            видео на YouTube.
+        </div>
+
+        <div class="sentence-item">
+            7. Мои родители каждый день смотрят 
+            <select class="prep-select" data-answer="-">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            новости.
+        </div>
+
+        <div class="sentence-item">
+            8. Не смотри 
+            <select class="prep-select" data-answer="на">
+                <option value="">...</option>
+                <option value="-">(—) nichts</option>
+                <option value="на">на</option>
+            </select>
+            солнце без очков!
+        </div>
+
+    </div>
+
+    <div class="feedback" id="feedback-display"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="solveAll()">Lösung anzeigen</button>
+    </div>
+
+</div>
+
+<script>
+    function checkAll() {
+        const selects = document.querySelectorAll('.prep-select');
+        let allCorrect = true;
+        let filledCount = 0;
+
+        selects.forEach(select => {
+            const val = select.value;
+            const correctAns = select.dataset.answer;
+
+            // Reset visual state
+            select.classList.remove('correct', 'wrong');
+
+            if (val !== "") {
+                filledCount++;
+                if (val === correctAns) {
+                    select.classList.add('correct');
+                } else {
+                    select.classList.add('wrong');
+                    allCorrect = false;
+                }
+            } else {
+                // Leeres Feld als falsch markieren
+                select.classList.add('wrong');
+                allCorrect = false;
+            }
+        });
+
+        const feedback = document.getElementById('feedback-display');
+
+        if (filledCount === 0) {
+            feedback.textContent = "Bitte wähle für jeden Satz eine Option.";
+            feedback.style.color = "#d9534f";
+            selects.forEach(s => s.classList.remove('wrong')); 
+        } else if (allCorrect) {
+            feedback.textContent = "Super! Du hast die Regel verstanden.";
+            feedback.style.color = "#28a745";
+        } else {
+            feedback.textContent = "Achte darauf: Medien ohne Präposition, Blickrichtung mit 'на'.";
+            feedback.style.color = "#dc3545";
+        }
+    }
+
+    function resetAll() {
+        const selects = document.querySelectorAll('.prep-select');
+        selects.forEach(select => {
+            select.value = "";
+            select.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-display').textContent = "";
+    }
+
+    function solveAll() {
+        const selects = document.querySelectorAll('.prep-select');
+        selects.forEach(select => {
+            select.value = select.dataset.answer;
+            select.classList.remove('wrong');
+            select.classList.add('correct');
+        });
+        
+        const feedback = document.getElementById('feedback-display');
+        feedback.textContent = "Lösungen angezeigt.";
+        feedback.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
