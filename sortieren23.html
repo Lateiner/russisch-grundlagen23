@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Drag & Drop Sortierung (8 Items)</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --border-color: #ccc;
+            --success-color: #28a745;
+            --success-bg: #d4edda;
+            --error-color: #dc3545;
+            --error-bg: #f8d7da;
+            --draggable-bg: #e3f2fd;
+            --draggable-border: #2196f3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .intro-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Drag & Drop Bereiche --- */
+        
+        /* Der Pool mit den Wörtern */
+        .source-container {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            min-height: 100px;
+            border: 2px dashed #bbb;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* Die Ziel-Spalten Container */
+        .targets-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .target-column {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .target-column h3 {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .drop-zone {
+            flex-grow: 1;
+            min-height: 200px; /* Etwas höher für mehr Items */
+            background-color: #fafafa;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Highlight beim Drüberziehen */
+        .drop-zone.drag-over {
+            background-color: #e8eaf6;
+            border-color: var(--primary-color);
+        }
+
+        /* --- Draggable Items --- */
+        .draggable-item {
+            background-color: white;
+            border: 1px solid var(--draggable-border);
+            border-left: 4px solid var(--draggable-border);
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: grab;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            user-select: none;
+            transition: transform 0.1s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        /* Deutsche Übersetzung klein daneben */
+        .de-hint {
+            font-size: 0.85em;
+            color: #777;
+            font-weight: normal;
+            margin-left: 10px;
+        }
+
+        /* Status: Richtig */
+        .draggable-item.correct {
+            background-color: var(--success-bg);
+            border-color: var(--success-color);
+            color: #155724;
+        }
+
+        /* Status: Falsch */
+        .draggable-item.wrong {
+            background-color: var(--error-bg);
+            border-color: var(--error-color);
+            color: #721c24;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 1.5em;
+        }
+
+        /* Responsive Design: Untereinander auf Mobile */
+        @media (max-width: 650px) {
+            .targets-wrapper {
+                flex-direction: column;
+            }
+            .target-column {
+                min-height: auto;
+            }
+            .drop-zone {
+                min-height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kategorisierung: Medien vs. Blickrichtung</h1>
+    
+    <div class="intro-box">
+        <p><strong>Aufgabe:</strong> Ziehe die Wörter in die richtige Spalte.</p>
+        <ul style="margin-top: 5px; padding-left: 20px;">
+            <li>Benutzt man das Wort direkt mit <strong>смотреть</strong> (Medien/Inhalt)?</li>
+            <li>Oder muss man <strong>смотреть НА</strong> benutzen (den Blick richten)?</li>
+        </ul>
+    </div>
+
+    <!-- Quelle (Wortpool) -->
+    <div class="source-container" id="source-pool" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <!-- Items Kat 1: Medien -->
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item1" data-cat="media">
+            фильм <span class="de-hint">(Film)</span>
+        </div>
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item2" data-cat="media">
+            новости <span class="de-hint">(Nachrichten)</span>
+        </div>
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item3" data-cat="media">
+            YouTube <span class="de-hint">(YouTube)</span>
+        </div>
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item7" data-cat="media">
+            сериал <span class="de-hint">(Serie)</span>
+        </div>
+        
+        <!-- Items Kat 2: Blickrichtung -->
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item4" data-cat="direction">
+            фотографию <span class="de-hint">(Foto)</span>
+        </div>
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item5" data-cat="direction">
+            доску <span class="de-hint">(Tafel)</span>
+        </div>
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item6" data-cat="direction">
+            учителя <span class="de-hint">(Lehrer)</span>
+        </div>
+        <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item8" data-cat="direction">
+            меня <span class="de-hint">(mich)</span>
+        </div>
+    </div>
+
+    <!-- Ziele -->
+    <div class="targets-wrapper">
+        <!-- Spalte 1 -->
+        <div class="target-column">
+            <h3>смотреть + Akkusativ<br><span style="font-size:0.8em; font-weight:normal;">(Medien / Inhalt)</span></h3>
+            <div class="drop-zone" id="target-media" data-cat="media" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+
+        <!-- Spalte 2 -->
+        <div class="target-column">
+            <h3>смотреть НА + Akkusativ<br><span style="font-size:0.8em; font-weight:normal;">(Blickrichtung)</span></h3>
+            <div class="drop-zone" id="target-direction" data-cat="direction" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback-display"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="solveAll()">Lösung anzeigen</button>
+    </div>
+
+</div>
+
+<script>
+    // --- Drag & Drop Logik ---
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        ev.target.style.opacity = "0.5";
+    }
+
+    document.addEventListener("dragend", function(event) {
+        event.target.style.opacity = "1";
+    });
+
+    function dragEnter(ev) {
+        ev.preventDefault();
+        let target = ev.target;
+        while(target && !target.classList.contains('drop-zone')) {
+            target = target.parentElement;
+        }
+        if(target) target.classList.add('drag-over');
+    }
+
+    function dragLeave(ev) {
+        let target = ev.target;
+        while(target && !target.classList.contains('drop-zone')) {
+            target = target.parentElement;
+        }
+        if(target) target.classList.remove('drag-over');
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+        
+        let target = ev.target;
+        
+        while(target && !target.classList.contains('drop-zone') && !target.classList.contains('source-container')) {
+            target = target.parentElement;
+        }
+
+        if (target) {
+            target.classList.remove('drag-over');
+            target.appendChild(draggedElement);
+            draggedElement.classList.remove('correct', 'wrong');
+        }
+    }
+
+    // --- Button Funktionen ---
+
+    function checkAll() {
+        const dropZones = document.querySelectorAll('.drop-zone');
+        let allCorrect = true;
+        let totalItemsInZones = 0;
+        let totalItems = document.querySelectorAll('.draggable-item').length;
+
+        dropZones.forEach(zone => {
+            const zoneCat = zone.dataset.cat;
+            const items = zone.querySelectorAll('.draggable-item');
+            
+            items.forEach(item => {
+                totalItemsInZones++;
+                if (item.dataset.cat === zoneCat) {
+                    item.classList.add('correct');
+                    item.classList.remove('wrong');
+                } else {
+                    item.classList.add('wrong');
+                    item.classList.remove('correct');
+                    allCorrect = false;
+                }
+            });
+        });
+
+        const feedback = document.getElementById('feedback-display');
+        
+        if (totalItemsInZones === 0) {
+            feedback.textContent = "Bitte ziehe die Wörter in die Spalten.";
+            feedback.style.color = "#d9534f";
+        } else if (totalItemsInZones < totalItems) {
+            feedback.textContent = "Du hast noch nicht alle Wörter zugeordnet.";
+            feedback.style.color = "#f0ad4e";
+            if(!allCorrect) {
+                 feedback.textContent += " Aber Achtung, einige Zuordnungen sind bereits falsch.";
+            }
+        } else if (allCorrect) {
+            feedback.textContent = "Perfekt! Alle Kategorien stimmen.";
+            feedback.style.color = "#28a745";
+        } else {
+            feedback.textContent = "Einige Zuordnungen sind falsch (rot markiert).";
+            feedback.style.color = "#dc3545";
+        }
+    }
+
+    function resetAll() {
+        const source = document.getElementById('source-pool');
+        const items = document.querySelectorAll('.draggable-item');
+        
+        items.forEach(item => {
+            source.appendChild(item);
+            item.classList.remove('correct', 'wrong');
+        });
+
+        document.getElementById('feedback-display').textContent = "";
+        document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+    }
+
+    function solveAll() {
+        const items = document.querySelectorAll('.draggable-item');
+        const targetMedia = document.getElementById('target-media');
+        const targetDir = document.getElementById('target-direction');
+
+        items.forEach(item => {
+            item.classList.remove('wrong');
+            item.classList.add('correct');
+            
+            if (item.dataset.cat === 'media') {
+                targetMedia.appendChild(item);
+            } else {
+                targetDir.appendChild(item);
+            }
+        });
+
+        const feedback = document.getElementById('feedback-display');
+        feedback.textContent = "Lösungen angezeigt.";
+        feedback.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
