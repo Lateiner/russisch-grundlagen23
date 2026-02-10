@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Konjugationstabellen</title>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --border-color: #ddd;
+            --success-color: #28a745;
+            --success-bg: #d4edda;
+            --error-color: #dc3545;
+            --error-bg: #f8d7da;
+            --header-bg: #e8eaf6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .intro-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Layout für die Tabellen --- */
+        .tables-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap; /* Wichtig für Responsivität */
+        }
+
+        .verb-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            flex: 1;
+            min-width: 300px; /* Mindestbreite vor Umbruch */
+            max-width: 400px;
+        }
+
+        .verb-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .verb-header .sub-text {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: normal;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* --- Tabellen-Stil --- */
+        .conj-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .conj-table th, .conj-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .conj-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pronoun-col {
+            width: 30%;
+            font-weight: bold;
+            color: #555;
+            background-color: #fafafa;
+        }
+
+        /* --- Dropdowns --- */
+        select.verb-select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            cursor: pointer;
+            
+            /* Custom Arrow für modernes Aussehen */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        select.verb-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+        }
+
+        /* Status-Farben */
+        select.verb-select.correct {
+            border-color: var(--success-color);
+            background-color: var(--success-bg);
+            color: #155724;
+            font-weight: bold;
+        }
+
+        select.verb-select.wrong {
+            border-color: var(--error-color);
+            background-color: var(--error-bg);
+            color: #721c24;
+        }
+
+        /* Hervorhebung der 1. Person (optional, da Fokus) */
+        .highlight-row td {
+            background-color: #fefeff;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 1.5em;
+        }
+
+        /* Mobile Optimierung */
+        @media (max-width: 600px) {
+            .verb-card {
+                width: 100%;
+                min-width: auto;
+            }
+            .conj-table th, .conj-table td {
+                padding: 10px 8px; /* Weniger Padding auf Handy */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Konjugationstabellen</h1>
+    
+    <div class="intro-box">
+        <p><strong>Aufgabe:</strong> Vervollständige die Tabellen. Achte besonders auf die <strong>1. Person Singular (Я)</strong> – hier gibt es oft Besonderheiten!</p>
+        <p>Wähle die korrekte Form aus dem Menü aus. Vorsicht vor falschen Endungen!</p>
+    </div>
+
+    <div class="tables-wrapper">
+        
+        <!-- Tabelle 1: Видеть -->
+        <div class="verb-card">
+            <div class="verb-header">
+                ВИДЕТЬ
+                <span class="sub-text">(sehen)</span>
+            </div>
+            <table class="conj-table">
+                <tr class="highlight-row">
+                    <td class="pronoun-col">Я</td>
+                    <td>
+                        <select class="verb-select" data-answer="вижу">
+                            <option value="">...</option>
+                            <option value="видю">видю</option> <!-- Typischer Fehler -->
+                            <option value="вижу">вижу</option>
+                            <option value="видью">видью</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Ты</td>
+                    <td>
+                        <select class="verb-select" data-answer="видишь">
+                            <option value="">...</option>
+                            <option value="видешь">видешь</option> <!-- Fehler I. Konj -->
+                            <option value="видишь">видишь</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Он / Она</td>
+                    <td>
+                        <select class="verb-select" data-answer="видит">
+                            <option value="">...</option>
+                            <option value="видит">видит</option>
+                            <option value="видет">видет</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Мы</td>
+                    <td>
+                        <select class="verb-select" data-answer="видим">
+                            <option value="">...</option>
+                            <option value="видим">видим</option>
+                            <option value="видем">видем</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Вы</td>
+                    <td>
+                        <select class="verb-select" data-answer="видите">
+                            <option value="">...</option>
+                            <option value="видите">видите</option>
+                            <option value="видете">видете</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Они</td>
+                    <td>
+                        <select class="verb-select" data-answer="видят">
+                            <option value="">...</option>
+                            <option value="видют">видют</option> <!-- Fehler I. Konj -->
+                            <option value="видят">видят</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Tabelle 2: Смотреть -->
+        <div class="verb-card">
+            <div class="verb-header">
+                СМОТРЕТЬ
+                <span class="sub-text">(schauen)</span>
+            </div>
+            <table class="conj-table">
+                <tr class="highlight-row">
+                    <td class="pronoun-col">Я</td>
+                    <td>
+                        <select class="verb-select" data-answer="смотрю">
+                            <option value="">...</option>
+                            <option value="смотрю">смотрю</option>
+                            <option value="смотру">смотру</option>
+                            <option value="смотрею">смотрею</option> <!-- Fehler -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Ты</td>
+                    <td>
+                        <select class="verb-select" data-answer="смотришь">
+                            <option value="">...</option>
+                            <option value="смотрешь">смотрешь</option> <!-- Fehler I. Konj -->
+                            <option value="смотришь">смотришь</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Он / Она</td>
+                    <td>
+                        <select class="verb-select" data-answer="смотрит">
+                            <option value="">...</option>
+                            <option value="смотрит">смотрит</option>
+                            <option value="смотрет">смотрет</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Мы</td>
+                    <td>
+                        <select class="verb-select" data-answer="смотрим">
+                            <option value="">...</option>
+                            <option value="смотрим">смотрим</option>
+                            <option value="смотрем">смотрем</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Вы</td>
+                    <td>
+                        <select class="verb-select" data-answer="смотрите">
+                            <option value="">...</option>
+                            <option value="смотрете">смотрете</option>
+                            <option value="смотрите">смотрите</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pronoun-col">Они</td>
+                    <td>
+                        <select class="verb-select" data-answer="смотрят">
+                            <option value="">...</option>
+                            <option value="смотрят">смотрят</option>
+                            <option value="смотрют">смотрют</option> <!-- Fehler I. Konj -->
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="feedback" id="feedback-display"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="solveAll()">Lösung anzeigen</button>
+    </div>
+
+</div>
+
+<script>
+    function checkAll() {
+        const selects = document.querySelectorAll('.verb-select');
+        let allCorrect = true;
+        let filledCount = 0;
+
+        selects.forEach(select => {
+            const val = select.value;
+            const correctAns = select.dataset.answer;
+
+            // Reset visual state
+            select.classList.remove('correct', 'wrong');
+
+            if (val !== "") {
+                filledCount++;
+                if (val === correctAns) {
+                    select.classList.add('correct');
+                } else {
+                    select.classList.add('wrong');
+                    allCorrect = false;
+                }
+            } else {
+                // Leeres Feld als falsch markieren
+                select.classList.add('wrong');
+                allCorrect = false;
+            }
+        });
+
+        const feedback = document.getElementById('feedback-display');
+
+        if (filledCount === 0) {
+            feedback.textContent = "Bitte fülle die Tabellen aus.";
+            feedback.style.color = "#d9534f";
+            selects.forEach(s => s.classList.remove('wrong')); // Keine roten Boxen bei Start
+        } else if (allCorrect) {
+            feedback.textContent = "Perfekt! Alle Formen richtig konjugiert.";
+            feedback.style.color = "#28a745";
+        } else {
+            feedback.textContent = "Einige Formen sind noch falsch. Achte auf die Vokale (и/е) und die 1. Person!";
+            feedback.style.color = "#dc3545";
+        }
+    }
+
+    function resetAll() {
+        const selects = document.querySelectorAll('.verb-select');
+        selects.forEach(select => {
+            select.value = "";
+            select.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-display').textContent = "";
+    }
+
+    function solveAll() {
+        const selects = document.querySelectorAll('.verb-select');
+        selects.forEach(select => {
+            select.value = select.dataset.answer;
+            select.classList.remove('wrong');
+            select.classList.add('correct');
+        });
+        
+        const feedback = document.getElementById('feedback-display');
+        feedback.textContent = "Lösungen angezeigt.";
+        feedback.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
