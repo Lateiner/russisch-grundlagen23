@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Lückentext Konjugation (Auswahl)</title>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --input-border: #ccc;
+            --success-color: #28a745;
+            --success-bg: #d4edda;
+            --error-color: #dc3545;
+            --error-bg: #f8d7da;
+            --hover-bg: #e8eaf6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 2.2; /* Großer Zeilenabstand für Dropdowns */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .intro-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Der Text-Container --- */
+        .cloze-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            font-size: 1.1rem;
+        }
+
+        /* --- Drop-Down Styling --- */
+        select.cloze-select {
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            padding: 5px 25px 5px 10px; /* Platz für den Pfeil */
+            font-size: 1rem;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-color: #fafafa;
+            cursor: pointer;
+            margin: 0 5px;
+            vertical-align: middle;
+            min-width: 120px;
+            
+            /* Custom Arrow Styling (optional für modernes Aussehen) */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        select.cloze-select:hover {
+            border-color: var(--primary-color);
+            background-color: #fff;
+        }
+
+        select.cloze-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+        }
+
+        /* Status: Richtig */
+        select.cloze-select.correct {
+            border-color: var(--success-color);
+            background-color: var(--success-bg);
+            color: #155724;
+            font-weight: bold;
+        }
+
+        /* Status: Falsch */
+        select.cloze-select.wrong {
+            border-color: var(--error-color);
+            background-color: var(--error-bg);
+            color: #721c24;
+        }
+
+        .verb-hint {
+            color: #777;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lückentext: Konjugation</h1>
+    
+    <div class="intro-box">
+        <p><strong>Aufgabe:</strong> Wähle die richtige Form aus dem Menü. Achte darauf, wer handelt (ich, du, sie...) und welches Verb passt (<span style="font-family: Arial;">видеть</span> vs. <span style="font-family: Arial;">смотреть</span>).</p>
+    </div>
+
+    <div class="cloze-card">
+        <p>
+            Привет! Меня зовут Антон. Я очень люблю кино. Каждый вечер я 
+            <select class="cloze-select" data-answer="смотрю">
+                <option value="">...</option>
+                <option value="вижу">вижу</option>
+                <option value="смотрю">смотрю</option>
+                <option value="смотришь">смотришь</option>
+            </select>
+            интересные фильмы.
+        </p>
+        
+        <p>
+            У меня есть сестра Аня. Сейчас она сидит у окна. Что она там 
+            <select class="cloze-select" data-answer="видит">
+                <option value="">...</option>
+                <option value="смотрит">смотрит</option>
+                <option value="видит">видит</option>
+                <option value="видят">видят</option>
+            </select>
+            ? <br>
+            Она 
+            <select class="cloze-select" data-answer="видит">
+                <option value="">...</option>
+                <option value="вижу">вижу</option>
+                <option value="смотрит">смотрит</option>
+                <option value="видит">видит</option>
+            </select>
+            парк и деревья.
+        </p>
+
+        <p>
+            — Антон, Аня! Вы 
+            <select class="cloze-select" data-answer="смотрите">
+                <option value="">...</option>
+                <option value="видите">видите</option>
+                <option value="смотрите">смотрите</option>
+                <option value="смотрим">смотрим</option>
+            </select>
+            новости? — спрашивает мама. <br>
+            — Нет, мы не 
+            <select class="cloze-select" data-answer="смотрим">
+                <option value="">...</option>
+                <option value="видим">видим</option>
+                <option value="смотрите">смотрите</option>
+                <option value="смотрим">смотрим</option>
+            </select>
+            , мы читаем.
+        </p>
+
+        <p>
+            Наши соседи старые. Они плохо 
+            <select class="cloze-select" data-answer="видят">
+                <option value="">...</option>
+                <option value="смотрят">смотрят</option>
+                <option value="видим">видим</option>
+                <option value="видят">видят</option>
+            </select>
+            , поэтому им нужны очки. <br>
+            А ты хорошо 
+            <select class="cloze-select" data-answer="видишь">
+                <option value="">...</option>
+                <option value="видишь">видишь</option>
+                <option value="смотришь">смотришь</option>
+                <option value="видит">видит</option>
+            </select>
+            ?
+        </p>
+    </div>
+
+    <div class="feedback" id="feedback-display"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="solveAll()">Lösung anzeigen</button>
+    </div>
+
+</div>
+
+<script>
+    function checkAll() {
+        const selects = document.querySelectorAll('.cloze-select');
+        let allCorrect = true;
+        let filledCount = 0;
+
+        selects.forEach(select => {
+            const val = select.value;
+            const correctAns = select.dataset.answer;
+
+            // Styles zurücksetzen
+            select.classList.remove('correct', 'wrong');
+
+            if (val !== "") {
+                filledCount++;
+                if (val === correctAns) {
+                    select.classList.add('correct');
+                } else {
+                    select.classList.add('wrong');
+                    allCorrect = false;
+                }
+            } else {
+                // Wenn nichts ausgewählt wurde
+                select.classList.add('wrong');
+                allCorrect = false;
+            }
+        });
+
+        const feedback = document.getElementById('feedback-display');
+
+        if (filledCount === 0) {
+            feedback.textContent = "Bitte wähle die Antworten aus.";
+            feedback.style.color = "#d9534f";
+            // Rote Markierung entfernen, wenn gar nichts gemacht wurde (clean start)
+            selects.forEach(s => s.classList.remove('wrong'));
+        } else if (allCorrect) {
+            feedback.textContent = "Hervorragend! Alle Formen sind richtig.";
+            feedback.style.color = "#28a745";
+        } else {
+            feedback.textContent = "Einige Formen stimmen nicht. Achte auf die Endungen!";
+            feedback.style.color = "#dc3545";
+        }
+    }
+
+    function resetAll() {
+        const selects = document.querySelectorAll('.cloze-select');
+        selects.forEach(select => {
+            select.value = "";
+            select.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-display').textContent = "";
+    }
+
+    function solveAll() {
+        const selects = document.querySelectorAll('.cloze-select');
+        selects.forEach(select => {
+            select.value = select.dataset.answer;
+            select.classList.remove('wrong');
+            select.classList.add('correct');
+        });
+        
+        const feedback = document.getElementById('feedback-display');
+        feedback.textContent = "Lösungen wurden eingesetzt.";
+        feedback.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
