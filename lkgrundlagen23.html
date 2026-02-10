@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch Vokabel-Trainer: Видеть und Смотреть</title>
+    <style>
+        :root {
+            /* Farbpalette (Grüntöne) */
+            --primary-color: #2e7d32;      /* Dunkelgrün für Buttons/Texte */
+            --primary-hover: #1b5e20;      /* Hover-Status */
+            --accent-color: #4caf50;       /* Helles Grün für Akzente */
+            --bg-color: #e8f5e9;           /* Sehr helles Grün für Hintergrund */
+            --card-bg: #ffffff;            /* Kartenhintergrund */
+            --text-color: #333333;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-hover: 0 10px 15px rgba(0,0,0,0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        /* Hauptcontainer */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Fortschrittsanzeige */
+        .progress {
+            font-weight: bold;
+            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* 3D Szene für die Karte */
+        .scene {
+            width: 100%;
+            height: 300px;
+            perspective: 1000px; /* Tiefe für 3D Effekt */
+            cursor: pointer;
+        }
+
+        /* Die Karte selbst */
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Klasse zum Umdrehen */
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Vorder- und Rückseite */
+        .card__face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent-color);
+        }
+
+        /* Vorderseite */
+        .card__face--front {
+            /* Standard */
+        }
+
+        /* Rückseite (gedreht) */
+        .card__face--back {
+            transform: rotateY(180deg);
+            background-color: #f1f8e9; /* Leicht abweichender Hintergrund hinten */
+        }
+
+        /* Textstyling auf der Karte */
+        .card-content {
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--text-color);
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .card-label {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+        }
+
+        .hint {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Steuerungselemente */
+        .controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secondary-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #388e3c;
+        }
+
+        /* Anleitung Footer */
+        .instructions {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .key-badge {
+            display: inline-block;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin: 0 2px;
+        }
+
+        /* Responsivität für kleine Bildschirme */
+        @media (max-width: 480px) {
+            .scene {
+                height: 250px;
+            }
+            .card-content {
+                font-size: 1.5rem;
+            }
+            .controls {
+                justify-content: space-between;
+            }
+            button {
+                flex: 1;
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Russisch Vokabeln</h1>
+        
+        <div class="progress" id="progressDisplay">1 / 30</div>
+
+        <div class="scene" id="scene">
+            <div class="card" id="card">
+                <div class="card__face card__face--front">
+                    <div class="card-label">Russisch</div>
+                    <div class="card-content" id="frontText">...</div>
+                    <div class="hint">(Klicken zum Umdrehen)</div>
+                </div>
+                <div class="card__face card__face--back">
+                    <div class="card-label">Deutsch</div>
+                    <div class="card-content" id="backText">...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn">← Vorherige</button>
+            <button id="nextBtn">Nächste →</button>
+        </div>
+
+        <div class="secondary-controls">
+            <button class="btn-secondary" id="shuffleBtn">🔀 Mischen</button>
+            <button class="btn-secondary" id="resetBtn">⏮ Zum Anfang</button>
+        </div>
+
+        <div class="instructions">
+            <p><strong>Tastatursteuerung:</strong></p>
+            <p>
+                <span class="key-badge">Leertaste</span> / <span class="key-badge">Enter</span> = Umdrehen<br>
+                <span class="key-badge">←</span> / <span class="key-badge">→</span> = Navigation<br>
+                <span class="key-badge">Pos1</span> = Zurück zum Start
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- Daten ---
+        // Die Vokabelliste basierend auf der Anfrage
+        const rawVocabData = [
+            { id: 1, ru: "ви́деть / уви́деть", de: "sehen" },
+            { id: 2, ru: "смотре́ть / посмотре́ть", de: "schauen, ansehen, blicken" },
+            { id: 3, ru: "глаз (Pl. глаза́)", de: "Auge" },
+            { id: 4, ru: "зре́ние", de: "Sehkraft, Sehvermögen" },
+            { id: 5, ru: "очки́", de: "Brille" },
+            { id: 6, ru: "телеви́зор", de: "Fernseher" },
+            { id: 7, ru: "фильм", de: "Film" },
+            { id: 8, ru: "сериа́л", de: "Serie" },
+            { id: 9, ru: "но́вости (Pl.)", de: "Nachrichten" },
+            { id: 10, ru: "програ́мма", de: "Programm, Sendung" },
+            { id: 11, ru: "ви́део", de: "Video" },
+            { id: 12, ru: "карти́на", de: "Bild, Gemälde" },
+            { id: 13, ru: "фотогра́фия", de: "Foto" },
+            { id: 14, ru: "доска́", de: "Tafel" },
+            { id: 15, ru: "дом", de: "Haus" },
+            { id: 16, ru: "де́рево", de: "Baum" },
+            { id: 17, ru: "магази́н", de: "Geschäft, Laden" },
+            { id: 18, ru: "ко́шка", de: "Katze" },
+            { id: 19, ru: "мужчи́на", de: "Mann" },
+            { id: 20, ru: "де́вушка", de: "junge Frau, Mädchen" },
+            { id: 21, ru: "преподава́тель", de: "Dozent, Lehrer" },
+            { id: 22, ru: "студе́нт", de: "Student" },
+            { id: 23, ru: "дру́г", de: "Freund" },
+            { id: 24, ru: "хорошо́", de: "gut" },
+            { id: 25, ru: "пло́хо", de: "schlecht" },
+            { id: 26, ru: "норма́льно", de: "normal" },
+            { id: 27, ru: "сле́ва", de: "links" },
+            { id: 28, ru: "спра́ва", de: "rechts" },
+            { id: 29, ru: "ничего́", de: "nichts" },
+            { id: 30, ru: "на (+ Akkusativ)", de: "auf (Richtung)" }
+        ];
+
+        // --- Status ---
+        let currentDeck = [...rawVocabData]; // Kopie für das aktuelle Deck (z.B. gemischt)
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        // --- DOM Elemente ---
+        const card = document.getElementById('card');
+        const scene = document.getElementById('scene');
+        const frontText = document.getElementById('frontText');
+        const backText = document.getElementById('backText');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // --- Funktionen ---
+
+        // Karte rendern (Text setzen, Index prüfen, Schriftgröße anpassen)
+        function renderCard() {
+            const item = currentDeck[currentIndex];
+            
+            // Text setzen
+            frontText.textContent = item.ru;
+            backText.textContent = item.de;
+            
+            // Flip zurücksetzen wenn wir rendern (es sei denn, wir wollen den Zustand behalten, aber bei Kartenwechsel ist Reset besser)
+            if (isFlipped) {
+                card.classList.remove('is-flipped');
+                isFlipped = false;
+            }
+
+            // Fortschritt
+            progressDisplay.textContent = `${currentIndex + 1} / ${currentDeck.length}`;
+
+            // Buttons aktivieren/deaktivieren
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === currentDeck.length - 1;
+
+            // Dynamische Schriftgröße
+            adjustFontSize(frontText, item.ru);
+            adjustFontSize(backText, item.de);
+        }
+
+        // Einfache Anpassung der Schriftgröße bei sehr langem Text
+        function adjustFontSize(element, text) {
+            // Basisgröße zurücksetzen
+            element.style.fontSize = "2rem";
+            
+            if (text.length > 25) {
+                element.style.fontSize = "1.5rem";
+            } else if (text.length > 15) {
+                element.style.fontSize = "1.8rem";
+            }
+        }
+
+        // Karte umdrehen
+        function flipCard() {
+            isFlipped = !isFlipped;
+            card.classList.toggle('is-flipped');
+        }
+
+        // Nächste Karte
+        function nextCard() {
+            if (currentIndex < currentDeck.length - 1) {
+                // Ein kleiner Trick: Wenn die Karte gedreht ist, erst zurückdrehen (ohne Animation sichtbar zu machen für den neuen Inhalt)
+                // Aber wir nutzen die CSS Transition. Besser: Erst Inhalt ändern, nachdem Flip zurückgesetzt wurde? 
+                // Einfacher Ansatz: Flip entfernen, kurz warten, neuen Inhalt. 
+                // Hier machen wir es direkt:
+                
+                if (isFlipped) {
+                    card.classList.remove('is-flipped');
+                    isFlipped = false;
+                    // Kurze Verzögerung für den Textwechsel, damit man nicht die Antwort der neuen Karte sofort sieht während sie sich zurückdreht
+                    setTimeout(() => {
+                        currentIndex++;
+                        renderCard(); // Render setzt Text neu
+                    }, 200);
+                } else {
+                    currentIndex++;
+                    renderCard();
+                }
+            }
+        }
+
+        // Vorherige Karte
+        function prevCard() {
+            if (currentIndex > 0) {
+                if (isFlipped) {
+                    card.classList.remove('is-flipped');
+                    isFlipped = false;
+                    setTimeout(() => {
+                        currentIndex--;
+                        renderCard();
+                    }, 200);
+                } else {
+                    currentIndex--;
+                    renderCard();
+                }
+            }
+        }
+
+        // Zum Anfang zurücksetzen
+        function resetToStart() {
+            currentIndex = 0;
+            // Wir behalten die aktuelle Sortierung (gemischt oder nicht) bei, gehen nur zum Start
+            if (isFlipped) {
+                card.classList.remove('is-flipped');
+                isFlipped = false;
+                setTimeout(renderCard, 200);
+            } else {
+                renderCard();
+            }
+        }
+
+        // Fisher-Yates Shuffle Algorithmus
+        function shuffleDeck() {
+            // Array kopieren
+            let array = [...currentDeck];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            currentDeck = array;
+            // Nach dem Mischen zum Start zurück
+            resetToStart();
+        }
+
+        // --- Event Listener ---
+
+        // Klick auf die Szene (Karte)
+        scene.addEventListener('click', (e) => {
+            // Verhindern, dass Klicks doppelt feuern, wenn man schnell klickt
+            flipCard();
+        });
+
+        // Buttons
+        nextBtn.addEventListener('click', nextCard);
+        prevBtn.addEventListener('click', prevCard);
+        resetBtn.addEventListener('click', resetToStart);
+        shuffleBtn.addEventListener('click', shuffleDeck);
+
+        // Tastatursteuerung
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case "ArrowRight":
+                    nextCard();
+                    break;
+                case "ArrowLeft":
+                    prevCard();
+                    break;
+                case " ": // Leertaste
+                case "Enter":
+                    e.preventDefault(); // Scrollen verhindern bei Leertaste
+                    flipCard();
+                    break;
+                case "Home": // Pos1
+                    resetToStart();
+                    break;
+            }
+        });
+
+        // --- Initialisierung ---
+        renderCard();
+
+    </script>
+</body>
+</html>
