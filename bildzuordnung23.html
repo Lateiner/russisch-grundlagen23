@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Bild-Zuordnung</title>
+    <!-- Polyfill (hier optional, aber für Konsistenz eingebunden) -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --success-color: #28a745;
+            --success-bg: #d4edda;
+            --error-color: #dc3545;
+            --error-bg: #f8d7da;
+            --selected-border: #3f51b5;
+            --selected-bg: #e8eaf6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .instruction-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Grid Layout für Responsivität --- */
+        .image-grid {
+            display: grid;
+            /* Automatische Anpassung: Mindestens 250px breit, sonst Umbruch */
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* --- Die einzelne Karte --- */
+        .task-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Das Bild (Emoji) */
+        .visual-stage {
+            font-size: 5rem; /* Großes Emoji */
+            margin-bottom: 15px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .context-text {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 3em; /* Damit Karten gleich hoch wirken */
+        }
+
+        /* Auswahl-Buttons in der Karte */
+        .selection-area {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .verb-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background-color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .verb-btn:hover {
+            border-color: #bbb;
+            background-color: #fafafa;
+        }
+
+        /* Status: Vom User ausgewählt */
+        .verb-btn.selected {
+            border-color: var(--selected-border);
+            background-color: var(--selected-bg);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Status: Richtig (nach Check) */
+        .verb-btn.correct {
+            border-color: var(--success-color);
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* Status: Falsch (nach Check) */
+        .verb-btn.wrong {
+            border-color: var(--error-color);
+            background-color: var(--error-color);
+            color: white;
+            opacity: 0.6;
+        }
+
+        /* --- Controls & Feedback --- */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 1.5em;
+        }
+
+        /* Responsive Anpassungen für sehr kleine Bildschirme */
+        @media (max-width: 400px) {
+            .visual-stage { font-size: 4rem; }
+            .image-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bild-Zuordnung: видеть vs. смотреть</h1>
+    
+    <div class="instruction-box">
+        <p><strong>Aufgabe:</strong> Schau dir die Bilder und die Situationen an. Welches Verb passt am besten? </p>
+        <p>Denk daran: <em>sehen</em> (Ergebnis, passiv) vs. <em>schauen</em> (Prozess, aktiv/bewusst).</p>
+    </div>
+
+    <!-- Grid Container für die Karten -->
+    <div class="image-grid">
+
+        <!-- Karte 1: Fernsehen (Aktiv) -->
+        <div class="task-card" id="card1" data-correct="smotret">
+            <div class="visual-stage">📺 👀</div>
+            <div class="context-text">
+                Jemand sitzt auf dem Sofa und verfolgt eine Sendung.
+            </div>
+            <div class="selection-area">
+                <button class="verb-btn" onclick="selectVerb('card1', 'videt')">видеть</button>
+                <button class="verb-btn" onclick="selectVerb('card1', 'smotret')">смотреть</button>
+            </div>
+        </div>
+
+        <!-- Karte 2: Geist/Schreck (Passiv/Ergebnis) -->
+        <div class="task-card" id="card2" data-correct="videt">
+            <div class="visual-stage">👻 😲</div>
+            <div class="context-text">
+                Plötzlich taucht etwas auf! Du erschrickst, weil du es wahrnimmst.
+            </div>
+            <div class="selection-area">
+                <button class="verb-btn" onclick="selectVerb('card2', 'videt')">видеть</button>
+                <button class="verb-btn" onclick="selectVerb('card2', 'smotret')">смотреть</button>
+            </div>
+        </div>
+
+        <!-- Karte 3: Fernglas (Aktiv/Prozess) -->
+        <div class="task-card" id="card3" data-correct="smotret">
+            <div class="visual-stage">🔭 🦅</div>
+            <div class="context-text">
+                Du suchst mit dem Fernglas nach Vögeln im Wald.
+            </div>
+            <div class="selection-area">
+                <button class="verb-btn" onclick="selectVerb('card3', 'videt')">видеть</button>
+                <button class="verb-btn" onclick="selectVerb('card3', 'smotret')">смотреть</button>
+            </div>
+        </div>
+
+        <!-- Karte 4: Augenarzt/Brille (Fähigkeit) -->
+        <div class="task-card" id="card4" data-correct="videt">
+            <div class="visual-stage">🤓 👓</div>
+            <div class="context-text">
+                Der Arzt fragt: "Gut oder schlecht? Brauchen Sie eine Brille?"
+            </div>
+            <div class="selection-area">
+                <button class="verb-btn" onclick="selectVerb('card4', 'videt')">видеть</button>
+                <button class="verb-btn" onclick="selectVerb('card4', 'smotret')">смотреть</button>
+            </div>
+        </div>
+
+        <!-- Karte 5: Museum/Gemälde (Betrachten) -->
+        <div class="task-card" id="card5" data-correct="smotret">
+            <div class="visual-stage">🖼️ 🧐</div>
+            <div class="context-text">
+                Du stehst im Museum und betrachtest lange ein Kunstwerk.
+            </div>
+            <div class="selection-area">
+                <button class="verb-btn" onclick="selectVerb('card5', 'videt')">видеть</button>
+                <button class="verb-btn" onclick="selectVerb('card5', 'smotret')">смотреть</button>
+            </div>
+        </div>
+
+        <!-- Karte 6: Fenster/Baum (Zufällig sehen) -->
+        <div class="task-card" id="card6" data-correct="videt">
+            <div class="visual-stage">🪟 🌳</div>
+            <div class="context-text">
+                Du gehst am Fenster vorbei. Da steht ein Baum. Er ist einfach da.
+            </div>
+            <div class="selection-area">
+                <button class="verb-btn" onclick="selectVerb('card6', 'videt')">видеть</button>
+                <button class="verb-btn" onclick="selectVerb('card6', 'smotret')">смотреть</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="feedback" id="feedback-display"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="solveAll()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    // Status-Speicher für die Benutzerauswahl
+    const userSelections = {};
+
+    function selectVerb(cardId, verb) {
+        // Speichere die Auswahl
+        userSelections[cardId] = verb;
+
+        // Visuelles Feedback für die Auswahl (Selected State)
+        const card = document.getElementById(cardId);
+        const buttons = card.querySelectorAll('.verb-btn');
+        
+        buttons.forEach(btn => {
+            // Reset styles
+            btn.classList.remove('selected', 'correct', 'wrong');
+            
+            // Prüfen, ob dies der geklickte Button ist (anhand des onclick Textes oder einfacher Logik)
+            // Da wir "verb" übergeben, prüfen wir den onclick-Inhalt oder Text
+            if(btn.getAttribute('onclick').includes(`'${verb}'`)) {
+                btn.classList.add('selected');
+            }
+        });
+        
+        // Feedback-Text zurücksetzen bei neuer Auswahl
+        document.getElementById('feedback-display').textContent = "";
+    }
+
+    function checkAll() {
+        const cards = document.querySelectorAll('.task-card');
+        let correctCount = 0;
+        let answeredCount = 0;
+
+        cards.forEach(card => {
+            const cardId = card.id;
+            const correctVerb = card.dataset.correct;
+            const userChoice = userSelections[cardId];
+            const buttons = card.querySelectorAll('.verb-btn');
+
+            // Erstmal alle Statusklassen entfernen
+            buttons.forEach(b => b.classList.remove('correct', 'wrong'));
+
+            if (userChoice) {
+                answeredCount++;
+                // Den ausgewählten Button finden
+                let selectedBtn;
+                buttons.forEach(btn => {
+                    if (btn.getAttribute('onclick').includes(`'${userChoice}'`)) {
+                        selectedBtn = btn;
+                    }
+                });
+
+                if (userChoice === correctVerb) {
+                    selectedBtn.classList.add('correct');
+                    correctCount++;
+                } else {
+                    selectedBtn.classList.add('wrong');
+                }
+            }
+        });
+
+        const feedbackEl = document.getElementById('feedback-display');
+        
+        if (answeredCount === 0) {
+            feedbackEl.textContent = "Bitte wähle für jedes Bild ein Verb aus.";
+            feedbackEl.style.color = "#dc3545";
+        } else if (answeredCount < cards.length) {
+            feedbackEl.textContent = "Du hast noch nicht alle Bilder bearbeitet.";
+            feedbackEl.style.color = "#e6a23c"; // Warning color
+        } else if (correctCount === cards.length) {
+            feedbackEl.textContent = "Perfekt! Alle Situationen richtig erkannt!";
+            feedbackEl.style.color = "#28a745";
+        } else {
+            feedbackEl.textContent = `Du hast ${correctCount} von ${cards.length} richtig. Schau dir die roten Fehler noch einmal an.`;
+            feedbackEl.style.color = "#dc3545";
+        }
+    }
+
+    function resetAll() {
+        // Auswahl leeren
+        for (let key in userSelections) delete userSelections[key];
+        
+        // UI zurücksetzen
+        const buttons = document.querySelectorAll('.verb-btn');
+        buttons.forEach(btn => btn.classList.remove('selected', 'correct', 'wrong'));
+        
+        document.getElementById('feedback-display').textContent = "";
+    }
+
+    function solveAll() {
+        resetAll(); // Erst alles clearen
+
+        const cards = document.querySelectorAll('.task-card');
+        cards.forEach(card => {
+            const correctVerb = card.dataset.correct;
+            const buttons = card.querySelectorAll('.verb-btn');
+            
+            buttons.forEach(btn => {
+                if (btn.getAttribute('onclick').includes(`'${correctVerb}'`)) {
+                    btn.classList.add('correct');
+                    // Wir simulieren hier keine User-Selection im state object, 
+                    // damit "Lösung anzeigen" rein visuell ist.
+                }
+            });
+        });
+
+        const feedbackEl = document.getElementById('feedback-display');
+        feedbackEl.textContent = "Lösungen werden angezeigt.";
+        feedbackEl.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
