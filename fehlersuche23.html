@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Fehlersuche (Erweitert)</title>
+    
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --border-color: #ccc;
+            --success-color: #28a745;
+            --success-bg: #d4edda;
+            --error-color: #dc3545;
+            --error-bg: #f8d7da;
+            --highlight-bg: #fff3cd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 2.0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .intro-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .editor-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-size: 1.15rem;
+            position: relative;
+        }
+
+        select.error-spot {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            border: none;
+            border-bottom: 2px dashed var(--primary-color);
+            background-color: var(--highlight-bg);
+            font-family: 'Arial', sans-serif;
+            font-size: 1.15rem;
+            color: #333;
+            font-weight: 500;
+            padding: 0 5px;
+            margin: 0 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            text-align: center;
+            text-align-last: center;
+        }
+
+        select.error-spot:hover {
+            background-color: #fff;
+            border-bottom-style: solid;
+        }
+
+        select.error-spot:focus {
+            outline: none;
+            background-color: #e3f2fd;
+            border-bottom-color: #2196f3;
+        }
+
+        select.error-spot.correct {
+            background-color: var(--success-bg);
+            border-bottom: 2px solid var(--success-color);
+            color: #155724;
+        }
+
+        select.error-spot.wrong {
+            background-color: var(--error-bg);
+            border-bottom: 2px solid var(--error-color);
+            color: #721c24;
+        }
+
+        .text-paragraph {
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: opacity 0.2s;
+            min-width: 140px;
+        }
+
+        button.action-btn:hover { opacity: 0.9; }
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #6c757d; color: white; }
+        .btn-solve { background-color: #17a2b8; color: white; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            min-height: 1.5em;
+        }
+
+        @media (max-width: 500px) {
+            .editor-card {
+                padding: 15px;
+                font-size: 1rem;
+            }
+            select.error-spot {
+                font-size: 1rem;
+                border: 1px solid #ddd;
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fehlersuche im Text</h1>
+    
+    <div class="intro-box">
+        <p><strong>Aufgabe:</strong> Lies den Text. Er enthält jetzt <strong>7 Fehler</strong> bei der Wahl von <em>видеть/смотреть</em> oder der Präposition.</p>
+        <p>Klicke auf die gelb markierten Wörter. Ist es falsch? Wähle die Korrektur. Ist es richtig? Lass es stehen.</p>
+    </div>
+
+    <div class="editor-card">
+        
+        <div class="text-paragraph">
+            Привет! Я очень люблю 
+            <select class="error-spot" data-original="видеть" data-correct="смотреть">
+                <option value="видеть">видеть</option> <!-- Fehler: Medienkonsum -->
+                <option value="смотреть">смотреть</option>
+            </select>
+            телевизор.
+        </div>
+
+        <div class="text-paragraph">
+            Вчера я 
+            <select class="error-spot" data-original="смотрел на" data-correct="смотрел">
+                <option value="смотрел на">смотрел на</option> <!-- Fehler: Film (Medien) ohne 'на' -->
+                <option value="смотрел">смотрел</option>
+            </select>
+            интересный фильм. 
+            В фильме я 
+            <select class="error-spot" data-original="видел" data-correct="видел">
+                <option value="видел">видел</option> <!-- Richtig: sah (Wahrnehmung) -->
+                <option value="смотрел">смотрел</option>
+            </select>
+            известного актёра.
+        </div>
+
+        <div class="text-paragraph">
+            Потом я пошёл гулять. В парке я 
+            <select class="error-spot" data-original="смотрел" data-correct="видел">
+                <option value="смотрел">смотрел</option> <!-- Fehler: sah einen Freund (zufällig) -->
+                <option value="видел">видел</option>
+            </select>
+            моего друга.
+        </div>
+
+        <div class="text-paragraph">
+            Я сказал: «Привет! Посмотри 
+            <select class="error-spot" data-original="—" data-correct="на">
+                <option value="—">мою новую машину!</option> <!-- Fehler: Blickrichtung braucht 'на' -->
+                <option value="на">на мою новую машину!</option>
+            </select>»
+        </div>
+
+        <div class="text-paragraph">
+            Но он забыл очки и сказал: «Извини, я ничего не 
+            <select class="error-spot" data-original="смотрю" data-correct="вижу">
+                <option value="смотрю">смотрю</option> <!-- Fehler: Fähigkeit zu sehen -->
+                <option value="вижу">вижу</option>
+            </select>».
+        </div>
+
+        <!-- NEUE SÄTZE -->
+        <div class="text-paragraph">
+            Мы пошли в кафе. Там мы пили кофе и 
+            <select class="error-spot" data-original="видели" data-correct="смотрели">
+                <option value="видели">видели</option> <!-- Fehler: Fußball schauen (aktiv) ist смотреть -->
+                <option value="смотрели">смотрели</option>
+            </select>
+            футбол.
+        </div>
+
+        <div class="text-paragraph">
+            Вдруг я 
+            <select class="error-spot" data-original="смотрел" data-correct="видел">
+                <option value="смотрел">смотрел</option> <!-- Fehler: sah (plötzlich bemerken) ist видел -->
+                <option value="видел">видел</option>
+            </select>
+            нашу преподавательницу.
+        </div>
+
+    </div>
+
+    <div class="feedback" id="feedback-display"></div>
+
+    <div class="controls">
+        <button class="action-btn btn-check" onclick="checkAll()">Überprüfen</button>
+        <button class="action-btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="action-btn btn-solve" onclick="solveAll()">Lösung anzeigen</button>
+    </div>
+
+</div>
+
+<script>
+    function checkAll() {
+        const spots = document.querySelectorAll('.error-spot');
+        let allCorrect = true;
+        
+        spots.forEach(spot => {
+            const userVal = spot.value;
+            const correctVal = spot.dataset.correct;
+
+            // Reset Styles
+            spot.classList.remove('correct', 'wrong');
+
+            if (userVal === correctVal) {
+                spot.classList.add('correct');
+            } else {
+                spot.classList.add('wrong');
+                allCorrect = false;
+            }
+        });
+
+        const feedback = document.getElementById('feedback-display');
+
+        if (allCorrect) {
+            feedback.textContent = "Perfekt! Du hast alle 7 Fehler gefunden und korrigiert.";
+            feedback.style.color = "#28a745";
+        } else {
+            feedback.textContent = "Es gibt noch Fehler im Text (rot markiert).";
+            feedback.style.color = "#dc3545";
+        }
+    }
+
+    function resetAll() {
+        const spots = document.querySelectorAll('.error-spot');
+        spots.forEach(spot => {
+            spot.value = spot.dataset.original;
+            spot.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-display').textContent = "";
+    }
+
+    function solveAll() {
+        const spots = document.querySelectorAll('.error-spot');
+        spots.forEach(spot => {
+            spot.value = spot.dataset.correct;
+            spot.classList.remove('wrong');
+            spot.classList.add('correct');
+        });
+        
+        const feedback = document.getElementById('feedback-display');
+        feedback.textContent = "Der Text ist jetzt fehlerfrei.";
+        feedback.style.color = "#17a2b8";
+    }
+</script>
+
+</body>
+</html>
